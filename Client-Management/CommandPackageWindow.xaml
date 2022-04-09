@@ -1,0 +1,78 @@
+﻿<Window
+    x:Class="Client_Management.CommandPackageWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="CommandPackageWindow"
+    Width="800"
+    Height="450"
+    MinWidth="350"
+    MinHeight="350"
+    mc:Ignorable="d">
+    <Grid>
+        <Label
+            Margin="10,2,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="Name:" />
+        <Label
+            Margin="10,40,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="File(s):" />
+        <TextBox
+            Margin="85,6,73,0"
+            VerticalAlignment="Top"
+            RenderTransformOrigin="0.517,0.615"
+            Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="NoWrap" />
+        <Button
+            Margin="85,40,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Command="{Binding AddFileCommand}"
+            Content=" &#10133; "
+            Foreground="Green"
+            ToolTip="Add" />
+        <Button
+            Margin="129,40,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Command="{Binding RemoveFileCommand}"
+            Content=" &#10060; "
+            Foreground="Red"
+            ToolTip="Remove" />
+        <ListBox
+            Height="118"
+            Margin="85,67,10,0"
+            VerticalAlignment="Top"
+            ItemsSource="{Binding Files}"
+            SelectedItem="{Binding SelectedFile, Mode=TwoWay}" />
+        <Label
+            Margin="10,211,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Content="Script:" />
+        <TextBox
+            Margin="85,211,10,10"
+            AcceptsReturn="True"
+            FontFamily="Consolas"
+            HorizontalScrollBarVisibility="Auto"
+            RenderTransformOrigin="0.517,0.615"
+            Text="{Binding Script, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="NoWrap"
+            VerticalScrollBarVisibility="Auto" />
+        <Button
+            Width="58"
+            Height="28"
+            Margin="0,6,10,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Command="{Binding SaveCommand}"
+            Content="{Binding SaveText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            Foreground="Green"
+            ToolTip="Save CommandPackage" />
+
+    </Grid>
+</Window>

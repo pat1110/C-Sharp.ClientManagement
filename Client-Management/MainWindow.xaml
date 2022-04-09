@@ -1,0 +1,353 @@
+﻿<Window
+    x:Class="Client_Management.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:Client_Management.Model"
+    Title="Client-Management [Inventory | Deployment]"
+    Width="800"
+    Height="450"
+    Cursor=""
+    Visibility="Visible"
+    WindowState="Maximized"
+    WindowStyle="SingleBorderWindow"
+    mc:Ignorable="d">
+
+    <!--
+        hier und innerhalb der Tab-Controls wird Grid als Layout verwendet, da es ansonsten zu Schwierigkeiten bei der Anzeige von
+        ListView und DataGrid kommen kann (kommt), da sich z.B. das DataGrid einfach nach unten aus dem Fensterbereich ausbreitet, wenn
+        zu viele Daten vorhanden sind und keine Scrollbar erscheint. Das ist bekannt
+    -->
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ToolBarPanel
+            Grid.Row="0"
+            FlowDirection="RightToLeft"
+            Orientation="Horizontal">
+            <Button
+                x:Name="Btn_Help"
+                Click="Btn_Help_click"
+                Content=" &#10067; "
+                ToolTip="Help and Info" />
+            <Button
+                x:Name="Btn_Settings"
+                Click="Btn_Settings_click"
+                Content=" &#128736; "
+                ToolTip="Settings" />
+        </ToolBarPanel>
+        <TabControl Grid.Row="1">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="18" Text="{Binding DeploymentText}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ToolBarTray Grid.Row="0">
+                        <ToolBar>
+                            <Button
+                                x:Name="Btn_New_CommandPackage"
+                                Click="Btn_New_CommandPackage_click"
+                                Content=" ✨ "
+                                Foreground="Orange"
+                                ToolTip="New" />
+                            <Button
+                                Command="{Binding RemoveCommandPackageCommand}"
+                                Content=" ✖ "
+                                Foreground="Red"
+                                ToolTip="Remove" />
+                            <Button
+                                Command="{Binding RefreshCommandPackageCommand}"
+                                Content=" &#x21bb; "
+                                Foreground="Green"
+                                ToolTip="Refresh" />
+                        </ToolBar>
+                        <ToolBar>
+                            <Label Content="Search:" />
+                            <TextBox MinWidth="200" Text="{Binding SearchTextCommand, UpdateSourceTrigger=PropertyChanged}" />
+                        </ToolBar>
+                    </ToolBarTray>
+                    <Border Grid.Row="0" Style="{StaticResource Seperator}" />
+                    <ListBox
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Packages}"
+                        SelectedItem="{Binding SelectedPackage, Mode=TwoWay}">
+                        <ListBox.ItemContainerStyle>
+                            <Style BasedOn="{StaticResource {x:Type ListBoxItem}}" TargetType="{x:Type ListBoxItem}">
+                                <EventSetter Event="MouseDoubleClick" Handler="OpenSelected" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="model:Package">
+                                <DockPanel>
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        DockPanel.Dock="Left"
+                                        FontWeight="Bold"
+                                        Text="{Binding Name}" />
+                                    <StackPanel
+                                        Margin="10,0,0,0"
+                                        DockPanel.Dock="Right"
+                                        Orientation="Vertical">
+                                        <TextBlock HorizontalAlignment="Right" Text="created: " />
+                                        <TextBlock HorizontalAlignment="Right" Text="{Binding CreatedDate}" />
+                                        <Separator />
+                                        <TextBlock HorizontalAlignment="Right" Text="last modified: " />
+                                        <TextBlock HorizontalAlignment="Right" Text="{Binding LastModifiedDate}" />
+                                    </StackPanel>
+                                    <TextBlock />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="18" Text="{Binding InventoryText}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ToolBarTray Grid.Row="0">
+                        <ToolBar>
+                            <Button
+                                Click="Btn_New_Computer_click"
+                                Content=" ✨ "
+                                Foreground="Orange"
+                                ToolTip="New" />
+                            <Button
+                                Command="{Binding RemoveComputerCommand}"
+                                Content=" &#10060; "
+                                Foreground="Red"
+                                ToolTip="Remove" />
+                            <Button
+                                Command="{Binding ScanComputerCommand}"
+                                Content=" &#128270; "
+                                Foreground="Blue"
+                                ToolTip="Scan" />
+                            <Button
+                                Command="{Binding RefreshComputersCommand}"
+                                Content=" &#x21bb; "
+                                Foreground="Green"
+                                ToolTip="Refresh" />
+                            <Button
+                                Command="{Binding ExecuteComputersCommand}"
+                                Content=" &#9889; "
+                                Foreground="DarkOrange"
+                                ToolTip="Execute Command" />
+                        </ToolBar>
+                        <ToolBar>
+                            <Label Content="Search:" />
+                            <TextBox MinWidth="200" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                        </ToolBar>
+                    </ToolBarTray>
+                    <Border Grid.Row="0" Style="{StaticResource Seperator}" />
+                    <DataGrid
+                        Grid.Row="1"
+                        AlternatingRowBackground="#F2F2F2"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        CanUserReorderColumns="True"
+                        CanUserResizeColumns="True"
+                        FrozenColumnCount="1"
+                        ItemsSource="{Binding Computers}"
+                        SelectedItem="{Binding SelectedComputer}"
+                        SelectionMode="Single"
+                        SelectionUnit="FullRow">
+                        <DataGrid.InputBindings>
+                            <MouseBinding Command="{Binding ComputerCommand}" Gesture="LeftDoubleClick" />
+                        </DataGrid.InputBindings>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Binding="{Binding Name}"
+                                Header="Name"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Binding="{Binding Domain}"
+                                Header="Domain"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Binding="{Binding Ip}"
+                                Header="IP-Address"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Binding="{Binding Manufacturer}"
+                                Header="Manufacturer"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding SystemFamily}"
+                                Header="SystemFamily"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Model}"
+                                Header="Model"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Version}"
+                                Header="OS-Version"
+                                IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="18" Text="{Binding GroupText}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ToolBarTray Grid.Row="0">
+                        <ToolBar>
+                            <Button
+                                Click="Btn_New_Group_click"
+                                Content=" ✨ "
+                                Foreground="Orange"
+                                ToolTip="New" />
+                            <Button
+                                Command="{Binding RemoveGroupCommand}"
+                                Content=" &#10060; "
+                                Foreground="Red"
+                                ToolTip="Remove" />
+                            <Button
+                                Command="{Binding RefreshGroupsCommand}"
+                                Content=" &#x21bb; "
+                                Foreground="Green"
+                                ToolTip="Refresh" />
+                            <Button
+                                Command="{Binding GroupExecuteCommand}"
+                                Content=" &#9889; "
+                                Foreground="DarkOrange"
+                                ToolTip="Execute Command" />
+                        </ToolBar>
+                        <ToolBar>
+                            <Label Content="Search:" />
+                            <TextBox MinWidth="200" Text="{Binding SearchTextGroup, UpdateSourceTrigger=PropertyChanged}" />
+                        </ToolBar>
+                    </ToolBarTray>
+                    <Border Grid.Row="0" Style="{StaticResource Seperator}" />
+                    <DataGrid
+                        Grid.Row="1"
+                        AlternatingRowBackground="#F2F2F2"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        CanUserReorderColumns="True"
+                        CanUserResizeColumns="True"
+                        FrozenColumnCount="1"
+                        ItemsSource="{Binding Groups}"
+                        MinColumnWidth="100"
+                        SelectedItem="{Binding SelectedGroup}"
+                        SelectionMode="Single"
+                        SelectionUnit="FullRow">
+                        <DataGrid.InputBindings>
+                            <MouseBinding Command="{Binding GroupCommand}" Gesture="LeftDoubleClick" />
+                        </DataGrid.InputBindings>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Binding="{Binding Name}"
+                                Header="Name"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Description}"
+                                Header="Description"
+                                IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="18" Text="{Binding JobsText}" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ToolBarTray Grid.Row="0">
+                        <ToolBar>
+                            <Button
+                                Command="{Binding RefreshJobsStateCommand}"
+                                Content=" &#x21bb; "
+                                Foreground="Green"
+                                ToolTip="Refresh" />
+                        </ToolBar>
+                    </ToolBarTray>
+                    <Border Grid.Row="0" Style="{StaticResource Seperator}" />
+                    <DataGrid
+                        Grid.Row="1"
+                        AlternatingRowBackground="#F2F2F2"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        CanUserReorderColumns="True"
+                        CanUserResizeColumns="True"
+                        ItemsSource="{Binding Jobs}"
+                        SelectedItem="{Binding SelectedJob}">
+                        <!-- <DataGrid.InputBindings>
+                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding JobCommand}"/>
+                        </DataGrid.InputBindings>
+                        -->
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Binding="{Binding State}"
+                                Header="State"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Binding="{Binding ComputerId}"
+                                Header="Computer-ID"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Binding="{Binding Command}"
+                                Header="CommandPackage"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Binding="{Binding ProcessId}"
+                                Header="Process-ID"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Binding="{Binding ReturnValue}"
+                                Header="ReturnValue"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding StartTime}"
+                                Header="Start"
+                                IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>
